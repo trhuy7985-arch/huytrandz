@@ -226,20 +226,10 @@
         }
 
         @keyframes phoenixSoar {
-            0% {
-                transform: translate(-35vw, 35vh) rotate(32deg) scale(0.45);
-                opacity: 0;
-            }
-            15% {
-                opacity: 1;
-            }
-            85% {
-                opacity: 1;
-            }
-            100% {
-                transform: translate(35vw, -38vh) rotate(32deg) scale(1.25);
-                opacity: 0;
-            }
+            0% { transform: translate(-35vw, 35vh) rotate(32deg) scale(0.45); opacity: 0; }
+            15% { opacity: 1; }
+            85% { opacity: 1; }
+            100% { transform: translate(35vw, -38vh) rotate(32deg) scale(1.25); opacity: 0; }
         }
 
         @keyframes flapLeft {
@@ -272,6 +262,67 @@
             30% { opacity: 1; transform: translateY(0) scale(1); }
             85% { opacity: 1; transform: translateY(0) scale(1.03); }
             100% { opacity: 0; transform: translateY(-10px) scale(1.05); }
+        }
+
+        /* === CSS CHO HIỆU ỨNG LOGO BOUNCE KHI BẤM BẮT ĐẦU THI === */
+        #logo-bounce-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 9998;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(8px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+        }
+
+        #logo-bounce-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .bounce-logo-img {
+            width: 190px;
+            height: 190px;
+            object-fit: contain;
+            filter: drop-shadow(0 12px 24px rgba(26, 54, 93, 0.18));
+            animation: customLogoBounce 0.65s cubic-bezier(0.28, 0.84, 0.42, 1) infinite alternate;
+        }
+
+        .bounce-logo-shadow {
+            width: 110px;
+            height: 14px;
+            background: radial-gradient(ellipse, rgba(26, 54, 93, 0.28) 0%, transparent 75%);
+            border-radius: 50%;
+            margin-top: 8px;
+            animation: customShadowBounce 0.65s cubic-bezier(0.28, 0.84, 0.42, 1) infinite alternate;
+        }
+
+        @keyframes customLogoBounce {
+            0% {
+                transform: translateY(-35px) scaleX(0.96) scaleY(1.04);
+            }
+            80% {
+                transform: translateY(0px) scaleX(1.02) scaleY(0.98);
+            }
+            100% {
+                transform: translateY(8px) scaleX(1.12) scaleY(0.88);
+            }
+        }
+
+        @keyframes customShadowBounce {
+            0% {
+                transform: scale(0.65);
+                opacity: 0.35;
+            }
+            100% {
+                transform: scale(1.15);
+                opacity: 0.85;
+            }
         }
     </style>
 </head>
@@ -345,6 +396,13 @@
         <div class="intro-brand-text text-xl md:text-2xl">
             YAECUTE EDUCATION
         </div>
+    </div>
+
+    <!-- ================= 0.5 HIỆU ỨNG LOGO BOUNCE KHI BẤM BẮT ĐẦU THI ================= -->
+    <div id="logo-bounce-overlay">
+        <img src="https://i.postimg.cc/Gm0gGjnj/Gemini-Generated-Image-gqn1iggqn1iggqn1.png" alt="VLCM Logo Bounce" class="bounce-logo-img">
+        <div class="bounce-logo-shadow"></div>
+        <p class="mt-6 text-navy font-extrabold text-sm tracking-widest uppercase animate-pulse">Đang tải dữ liệu phòng thi...</p>
     </div>
 
     <!-- ================= 1. GIAO DIỆN ĐĂNG NHẬP / ĐĂNG KÝ ================= -->
@@ -762,6 +820,10 @@
     <div id="modal-confirm" class="hidden fixed inset-0 z-50 flex items-center justify-center">
         <div class="absolute inset-0 bg-[#fff5f5] opacity-90" style="background-image: radial-gradient(#fecdd3 1px, transparent 1px); background-size: 20px 20px;"></div>
         <div class="relative bg-white rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.1)] w-full max-w-md p-8 md:p-10 border border-gray-100 z-10">
+            <!-- Logo nảy nhẹ phía trên bảng xác nhận -->
+            <div class="flex justify-center mb-4">
+                <img src="https://i.postimg.cc/Gm0gGjnj/Gemini-Generated-Image-gqn1iggqn1iggqn1.png" alt="VLCM Logo" class="h-16 object-contain animate-bounce">
+            </div>
             <h2 class="text-2xl font-bold text-center text-gray-800 mb-8">Xác nhận thông tin dự thi</h2>
             <div class="space-y-4 mb-8">
                 <div class="flex items-center">
@@ -978,6 +1040,16 @@
         window.addEventListener('DOMContentLoaded', () => {
             setTimeout(skipIntro, 2500);
         });
+
+        // --- HÀM CHẠY HIỆU ỨNG LOGO BOUNCE ---
+        function playLogoBounce(callback) {
+            const overlay = document.getElementById('logo-bounce-overlay');
+            overlay.classList.add('active');
+            setTimeout(() => {
+                overlay.classList.remove('active');
+                if (typeof callback === 'function') callback();
+            }, 1200);
+        }
 
         // --- HÀM LỌC VÀ RENDER ĐỀ THI TSA ---
         function filterTSA(category) {
@@ -1385,7 +1457,7 @@
             }
         }
 
-        // --- PHÒNG THI SOLO ---
+        // --- PHÒNG THI SOLO (ĐÃ TÍCH HỢP LOGO BOUNCE KHI ẤN BẮT ĐẦU THI) ---
         function openConfirmModal(examId) {
             const examInfo = examsMeta.find(e => e.id === examId);
             if(!examInfo) return alert("Không tìm thấy dữ liệu đề thi!");
@@ -1401,7 +1473,10 @@
             currentExamType = examInfo.type; 
             userAnswers = {}; 
             
-            document.getElementById('modal-confirm').classList.remove('hidden');
+            // Chạy hiệu ứng Logo Bounce trước khi mở bảng xác nhận
+            playLogoBounce(() => {
+                document.getElementById('modal-confirm').classList.remove('hidden');
+            });
         }
 
         function closeConfirmModal() {
@@ -1484,46 +1559,50 @@
 
         function startActualExam() {
             document.getElementById('modal-confirm').classList.add('hidden');
-            document.getElementById('app-container').classList.add('hidden');
-            document.getElementById('view-active-exam').classList.remove('hidden');
             
-            const examInfo = examsMeta.find(e => e.id === currentExamId);
-            document.getElementById('active-exam-title').innerText = examInfo.title;
-            document.getElementById('exam-student-name').innerText = currentUser.name;
-            
-            const grid = document.getElementById('question-grid');
-            grid.innerHTML = '';
-            
-            const examQuestionsData = allExamsData[currentExamId] || [];
-            
-            examQuestionsData.forEach((q, index) => {
-                let classes = "w-10 h-10 rounded-full text-sm font-bold flex items-center justify-center transition-colors cursor-pointer hover:bg-gray-200 ";
-                classes += "bg-gray-100 text-gray-600";
-                grid.innerHTML += `<button id="grid-btn-${q.id}" onclick="scrollToQuestion(${index + 1})" class="${classes}">${index + 1}</button>`;
-            });
+            // Chạy hiệu ứng Logo Bounce trước khi mở giao diện phòng thi chính thức
+            playLogoBounce(() => {
+                document.getElementById('app-container').classList.add('hidden');
+                document.getElementById('view-active-exam').classList.remove('hidden');
+                
+                const examInfo = examsMeta.find(e => e.id === currentExamId);
+                document.getElementById('active-exam-title').innerText = examInfo.title;
+                document.getElementById('exam-student-name').innerText = currentUser.name;
+                
+                const grid = document.getElementById('question-grid');
+                grid.innerHTML = '';
+                
+                const examQuestionsData = allExamsData[currentExamId] || [];
+                
+                examQuestionsData.forEach((q, index) => {
+                    let classes = "w-10 h-10 rounded-full text-sm font-bold flex items-center justify-center transition-colors cursor-pointer hover:bg-gray-200 ";
+                    classes += "bg-gray-100 text-gray-600";
+                    grid.innerHTML += `<button id="grid-btn-${q.id}" onclick="scrollToQuestion(${index + 1})" class="${classes}">${index + 1}</button>`;
+                });
 
-            const watermark = document.getElementById('watermark-container');
-            watermark.innerHTML = '';
-            for(let i=0; i<30; i++) {
-                watermark.innerHTML += `<span class="watermark-text">${currentUser.name} - ${currentSessionEmail}</span>`;
-            }
-
-            renderExamContainer(examQuestionsData);
-
-            let timer = currentExamTime * 60;
-            clearInterval(soloTimerInterval);
-            soloTimerInterval = setInterval(() => {
-                let h = Math.floor(timer / 3600);
-                let m = Math.floor((timer % 3600) / 60);
-                let s = timer % 60;
-                document.getElementById('countdown-timer').innerText = 
-                    `${h < 10 ? '0'+h : h}:${m < 10 ? '0'+m : m}:${s < 10 ? '0'+s : s}`;
-                if (--timer < 0) {
-                    clearInterval(soloTimerInterval);
-                    alert("Hết giờ làm bài!");
-                    submitExam();
+                const watermark = document.getElementById('watermark-container');
+                watermark.innerHTML = '';
+                for(let i=0; i<30; i++) {
+                    watermark.innerHTML += `<span class="watermark-text">${currentUser.name} - ${currentSessionEmail}</span>`;
                 }
-            }, 1000);
+
+                renderExamContainer(examQuestionsData);
+
+                let timer = currentExamTime * 60;
+                clearInterval(soloTimerInterval);
+                soloTimerInterval = setInterval(() => {
+                    let h = Math.floor(timer / 3600);
+                    let m = Math.floor((timer % 3600) / 60);
+                    let s = timer % 60;
+                    document.getElementById('countdown-timer').innerText = 
+                        `${h < 10 ? '0'+h : h}:${m < 10 ? '0'+m : m}:${s < 10 ? '0'+s : s}`;
+                    if (--timer < 0) {
+                        clearInterval(soloTimerInterval);
+                        alert("Hết giờ làm bài!");
+                        submitExam();
+                    }
+                }, 1000);
+            });
         }
 
         // LƯU ĐÁP ÁN CHO 3 DẠNG CÂU HỎI
