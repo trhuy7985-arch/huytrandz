@@ -62,7 +62,7 @@ const allExamsData = {
         },
         {
             id: 807, type: "multiple_choice",
-            content: "Nicotine làm tăng huyết áp và nhịp tim, có khả năng gây xơ vữa động mạch vành và suy giảm trí nhớ. Trong cây thuốc lá và khói thuốc lá chứa một amine rất độc, đó là nicotine với công thức cấu tạo như sau:<br><img src='LINK_ANH_CUA_BAN' class='mt-4 mb-4 max-w-xs mx-auto rounded-lg border border-gray-200 shadow-sm'><br>Công thức phân tử nicotine là <!--[cite: 80] -->",
+            content: "Nicotine làm tăng huyết áp và nhịp tim, có khả năng gây xơ vữa động mạch vành và suy giảm trí nhớ. Trong cây thuốc lá và khói thuốc lá chứa một amine rất độc, đó là nicotine với công thức cấu tạo như sau:<br><img src='https://i.postimg.cc/vm3BGjkd/nc.png' class='mt-4 mb-4 max-w-xs mx-auto rounded-lg border border-gray-200 shadow-sm'><br>Công thức phân tử nicotine là <!--[cite: 80] -->",
             options: ["A. $C_{10}H_{14}N_2$.", "B. $C_{10}H_{12}N_2$.", "C. $C_{11}H_{12}N_2$.", "D. $C_{11}H_{16}N_2$."],
             correctAnswer: "A"
         },
