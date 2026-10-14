@@ -85,19 +85,73 @@
             border-radius: 50%;
         }
 
-        /* --- CSS HIỆU ỨNG CHUYỂN CẢNH ĐƯỢC THÊM VÀO ĐÂY --- */
         @keyframes fadeSlideUp {
-            from {
-                opacity: 0;
-                transform: translateY(15px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         .animate-view {
             animation: fadeSlideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        /* === CSS CHO TRỢ LÝ GEMINI === */
+        .gemini-fab {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #1A73E8, #8AB4F8);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(26, 115, 232, 0.4);
+            cursor: pointer;
+            z-index: 100;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .gemini-fab:hover {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 6px 20px rgba(26, 115, 232, 0.6);
+        }
+
+        .gemini-chat-panel {
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            width: 350px;
+            height: 500px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            z-index: 99;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(20px) scale(0.95);
+            transform-origin: bottom right;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .gemini-chat-panel.active {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0) scale(1);
+        }
+        
+        .sparkle-icon {
+            color: white;
+            font-size: 28px;
+            filter: drop-shadow(0 0 2px rgba(255,255,255,0.8));
+            animation: pulse-glow 2s infinite alternate;
+        }
+
+        @keyframes pulse-glow {
+            from { filter: drop-shadow(0 0 2px rgba(255,255,255,0.5)); transform: scale(1); }
+            to { filter: drop-shadow(0 0 8px rgba(255,255,255,1)); transform: scale(1.05); }
         }
     </style>
 </head>
@@ -110,8 +164,8 @@
 
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 p-8 relative z-10 border border-gray-100">
             <div class="flex justify-center items-center mb-8">
-    <img src="https://res.cloudinary.com/oewohmxo/image/upload/f_auto,q_auto/imp.pnj" alt="VLCM Logo" class="h15- object-contain">
-</div>
+                <img src="https://i.postimg.cc/Gm0gGjnj/Gemini-Generated-Image-gqn1iggqn1iggqn1.png" alt="VLCM Logo" class="h-15 object-contain">
+            </div>
 
             <div class="flex mb-6 bg-gray-50 rounded-lg p-1">
                 <button id="tab-login" onclick="switchAuth('login')" class="flex-1 py-2 text-sm font-bold rounded-md bg-white shadow-sm text-navy transition-all">Đăng nhập</button>
@@ -174,26 +228,29 @@
     <!-- ================= 2. HỆ THỐNG CHÍNH ================= -->
     <div id="app-container" class="h-screen flex-col hidden w-full bg-gray-50">
         <!-- === HEADER === -->
-        <header class="bg-white py-3 px-6 flex justify-between items-center border-b border-gray-200 z-20 shrink-0">
-            <div class="flex items-center gap-3">
+        <header class="bg-white py-3 px-6 flex items-center justify-between border-b border-gray-200 z-20 shrink-0 gap-4">
+            <!-- 1. Khu vực Logo -->
+            <div class="flex items-center gap-3 w-auto lg:w-64 shrink-0">
                 <button class="md:hidden text-gray-500 hover:text-navy transition-colors mr-1">
                     <i class="fa-solid fa-bars text-xl"></i>
                 </button>
                 <div class="flex items-center cursor-pointer" onclick="switchView('home')">
-    <img src="https://res.cloudinary.com/oewohmxo/image/upload/f_auto,q_auto/imp.pnj" alt="VLCM Logo" class="h-14 object-contain">
-</div>
-            </div>
-
-            <div class="hidden md:flex flex-1 max-w-xl mx-8">
-                <div class="relative w-full">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <i class="fa-solid fa-magnifying-glass text-gray-400 text-sm"></i>
-                    </div>
-                    <input type="text" class="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-full text-sm" placeholder="Tìm kiếm khóa học, đề thi...">
+                    <img src="https://i.postimg.cc/Gm0gGjnj/Gemini-Generated-Image-gqn1iggqn1iggqn1.png" alt="VLCM Logo" class="h-14 object-contain">
                 </div>
             </div>
 
-            <div class="flex items-center gap-5">
+            <!-- 2. Thanh tìm kiếm -->
+            <div class="hidden md:flex flex-1 max-w-3xl mx-4">
+                <div class="relative w-full">
+                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <i class="fa-solid fa-magnifying-glass text-gray-400 text-sm"></i>
+                    </div>
+                    <input type="text" class="w-full pl-11 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-full text-sm focus:outline-none focus:border-blue-400 focus:bg-white transition-all hover:bg-gray-100" placeholder="Tìm kiếm khóa học, đề thi...">
+                </div>
+            </div>
+
+            <!-- 3. Khu vực User -->
+            <div class="flex items-center gap-5 justify-end w-auto lg:w-64 shrink-0">
                 <button class="relative text-gray-500 hover:text-navy transition">
                     <i class="fa-regular fa-bell text-xl"></i>
                     <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
@@ -248,6 +305,23 @@
                         <i class="fa-solid fa-clock-rotate-left w-5 text-center text-gray-400"></i> Lịch sử làm bài
                     </a>
                 </nav>
+
+                <!-- KHỐI CHUỖI HỌC TẬP (STREAK) -->
+                <div class="mt-4 mb-2 bg-gradient-to-br from-orange-50 to-red-50 border border-orange-100 rounded-xl p-4 flex items-center gap-3 shadow-sm relative group cursor-default">
+                    <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm text-orange-500 text-lg shrink-0">
+                        <i class="fa-solid fa-fire-flame-curved" id="streak-icon"></i>
+                    </div>
+                    <div>
+                        <div class="text-[10px] font-extrabold text-orange-800 uppercase tracking-widest">Chuỗi học tập</div>
+                        <div class="text-lg font-black text-orange-600 leading-none mt-1"><span id="streak-days-count">0</span> ngày</div>
+                    </div>
+                    
+                    <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 bg-gray-800 text-white text-xs p-2.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none text-center z-50 shadow-lg">
+                        Hoàn thành ít nhất 1 bài thi mỗi ngày để duy trì ngọn lửa! 🔥
+                        <div class="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-800"></div>
+                    </div>
+                </div>
+
                 <div class="border-t border-gray-100 pt-4 mt-2">
                     <a href="javascript:void(0)" onclick="switchView('settings')" id="nav-settings" class="nav-item flex items-center gap-3 px-4 py-3 text-gray-600 rounded-xl hover:bg-gray-50 hover:text-navy font-semibold transition-colors text-sm">
                         <i class="fa-solid fa-gear w-5 text-center text-gray-400"></i> Cài đặt tài khoản
@@ -315,15 +389,36 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- BẢNG VÀNG CHUỖI HỌC TẬP -->
+                    <div class="mt-12 mb-6 flex justify-between items-end">
+                        <div>
+                            <h3 class="text-2xl font-extrabold text-navy">Bảng Vàng Nỗ Lực 🏆</h3>
+                            <p class="text-gray-500 text-sm mt-1">Top những học viên giữ lửa học tập kiên trì nhất</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                        <ul id="streak-leaderboard-list" class="divide-y divide-gray-100">
+                            <!-- JS sẽ tự động sinh danh sách top học viên vào đây -->
+                            <li class="p-8 text-center text-gray-400 font-medium">Đang tải dữ liệu...</li>
+                        </ul>
+                    </div>
                 </div>
 
-                <!-- 2.2 DANH SÁCH ĐỀ THI LÝ THUYẾT (Solo TSA) -->
+                <!-- 2.2 DANH SÁCH ĐỀ THI LÝ THUYẾT (Solo TSA) - ĐÃ CẬP NHẬT TAB -->
                 <div id="view-exam-list" class="hidden max-w-6xl mx-auto">
-                    <div class="mb-8">
+                    <div class="mb-6">
                         <h2 class="text-2xl font-extrabold text-navy">Kỳ thi Đánh giá tư duy TSA</h2>
                         <p class="text-gray-500 mt-1">Luyện tập với các đề thi chuẩn cấu trúc mới nhất.</p>
                     </div>
-                    <!-- Container trống để JS đổ danh sách đề TSA vào -->
+                    <!-- Thanh chuyển Tab 4 phần TSA -->
+                    <div class="flex flex-wrap gap-2 mb-8 bg-white p-2 rounded-xl shadow-sm border border-gray-100 w-max">
+                        <button onclick="filterTSA('math')" id="tab-tsa-math" class="tsa-tab px-6 py-2.5 rounded-lg font-bold text-sm bg-purple-50 text-purple-700 transition-colors">Tư duy Toán học</button>
+                        <button onclick="filterTSA('reading')" id="tab-tsa-reading" class="tsa-tab px-6 py-2.5 rounded-lg font-bold text-sm text-gray-500 hover:bg-gray-50 transition-colors">Tư duy Đọc hiểu</button>
+                        <button onclick="filterTSA('science')" id="tab-tsa-science" class="tsa-tab px-6 py-2.5 rounded-lg font-bold text-sm text-gray-500 hover:bg-gray-50 transition-colors">Tư duy Khoa học</button>
+                        <button onclick="filterTSA('comprehensive')" id="tab-tsa-comprehensive" class="tsa-tab px-6 py-2.5 rounded-lg font-bold text-sm text-gray-500 hover:bg-gray-50 transition-colors">Đề Tổng hợp</button>
+                    </div>
                     <div id="tsa-exam-container" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"></div>
                 </div>
 
@@ -340,7 +435,6 @@
                         <button onclick="filterTHPT('chemistry')" id="tab-chemistry" class="thpt-tab px-6 py-2.5 rounded-lg font-bold text-sm text-gray-500 hover:bg-gray-50 transition-colors">Hóa học</button>
                         <button onclick="filterTHPT('biology')" id="tab-biology" class="thpt-tab px-6 py-2.5 rounded-lg font-bold text-sm text-gray-500 hover:bg-gray-50 transition-colors">Sinh học</button>
                     </div>
-                    <!-- Container chứa đề thi theo môn -->
                     <div id="thpt-exam-container" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"></div>
                 </div>
 
@@ -422,7 +516,6 @@
                         <p class="text-gray-500 mt-1">Xem lại kết quả và thời gian hoàn thành các bài thi của bạn.</p>
                     </div>
                     <div id="exam-history-container" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 min-h-[400px] flex flex-col">
-                        <!-- JS sẽ đổ dữ liệu lịch sử vào đây -->
                         <div class="text-center text-gray-400 font-medium py-10 mt-10">Đang tải dữ liệu...</div>
                     </div>
                 </div>
@@ -611,14 +704,12 @@
             </button>
         </header>
         <div class="flex-1 flex overflow-hidden p-4 md:p-6 gap-6 relative">
-            <!-- Khu vực câu hỏi & Đáp án (Trái) -->
             <div class="flex-1 bg-white rounded-xl shadow-sm border border-gray-200 overflow-y-auto relative flex flex-col">
                 <div id="review-content-container" class="p-8 relative z-10 flex-1">
                     <!-- JS sẽ tự động đổ danh sách câu hỏi xem lại vào đây -->
                 </div>
             </div>
 
-            <!-- Panel Thông tin (Phải) -->
             <div class="w-80 flex flex-col gap-6 shrink-0 h-full">
                 <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5 flex-1 flex flex-col overflow-hidden">
                     <h3 class="font-bold text-gray-800 text-sm text-center mb-4">Mức độ hoàn thành</h3>
@@ -633,8 +724,47 @@
             </div>
         </div>
     </div>
+
+    <!-- ================= TRỢ LÝ GEMINI ================= -->
+    <div class="gemini-fab" onclick="toggleGeminiChat()">
+        <i class="fa-solid fa-wand-magic-sparkles sparkle-icon"></i>
+    </div>
+
+    <div id="gemini-chat-panel" class="gemini-chat-panel border border-blue-100">
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-blue-600 to-blue-400 p-4 flex justify-between items-center text-white shrink-0">
+            <div class="flex items-center gap-2 font-bold">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                Trợ lý Gemini Pro
+            </div>
+            <button onclick="toggleGeminiChat()" class="hover:bg-white/20 p-1.5 rounded-full transition"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        
+        <!-- Khu vực hiển thị tin nhắn -->
+        <div id="gemini-messages" class="flex-1 p-4 overflow-y-auto bg-gray-50/50 text-sm space-y-4">
+            <div class="flex gap-3">
+                <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center shrink-0">
+                    <i class="fa-solid fa-robot"></i>
+                </div>
+                <div class="bg-white p-3 rounded-2xl rounded-tl-none shadow-sm border border-gray-100 text-gray-700">
+                    Chào bạn! Mình là trợ lý AI tích hợp Gemini 1.5 Pro. Bạn cần giải thích câu hỏi nào hay muốn ôn tập lý thuyết phần nào hôm nay?
+                </div>
+            </div>
+        </div>
+
+        <!-- Ô nhập liệu -->
+        <div class="p-3 bg-white border-t border-gray-100 shrink-0">
+            <form onsubmit="sendGeminiMessage(event)" class="relative">
+                <input id="gemini-input" type="text" autocomplete="off" class="w-full bg-gray-100 border border-gray-200 text-sm rounded-full py-2.5 pl-4 pr-12 focus:outline-none focus:border-blue-400 focus:bg-white transition-colors" placeholder="Hỏi trợ lý AI...">
+                <button type="submit" class="absolute right-1.5 top-1.5 w-8 h-8 bg-blue-500 hover:bg-blue-600 text-white rounded-full flex items-center justify-center transition-colors">
+                    <i class="fa-solid fa-paper-plane text-xs"></i>
+                </button>
+            </form>
+        </div>
+    </div>
     
     <!-- ================= 6. JAVASCRIPT ================= -->
+    <script src="data.js"></script>
     <script>
         // --- CÁC BIẾN TOÀN CỤC ---
         let currentSessionEmail = null;
@@ -646,534 +776,75 @@
         let currentExamTime = 0;
         let soloTimerInterval;
 
-        // --- CẤU TRÚC LƯU NHIỀU ĐỀ THI ---
-        const examsMeta = [
-            {
-                id: "tsa_01",
-                type: "TSA",
-                title: "NTT DETHW - VIP",
-                questionsCount: 28,
-                time: 150,
-                img: "https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&q=80&w=800",
-                isVip: true
-            },
-            {
-                id: "tsa_02",
-                type: "TSA",
-                title: "Đề thi thử HUST 2026 - Lần 1",
-                questionsCount: 15,
-                time: 60,
-                img: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&q=80&w=800",
-                isVip: false
-            },
-            {
-                id: "thpt_01",
-                type: "THPT",
-                subject: "math",
-                title: "Sở GD&ĐT Hà Nội - Lần 1",
-                questionsCount: 50,
-                time: 90,
-                img: "fa-building-columns", 
-                isVip: false
-            },
-            {
-                id: "thpt_toan_01",
-                type: "THPT",
-                subject: "math",
-                title: "Đề thi thử Toán 2025 (Chuẩn cấu trúc)",
-                questionsCount: 22,
-                time: 90,
-                img: "fa-calculator", 
-                isVip: false
-            },
-            {
-                id: "thpt_toan_02",
-                type: "THPT",
-                subject: "math",
-                title: "Đề thi Tốt nghiệp THPT 2026 môn Toán (Mã đề 0101)",
-                questionsCount: 22,
-                time: 90,
-                img: "fa-calculator",
-                isVip: false
-            },
-            {
-                id: "thpt_ly_01",
-                type: "THPT",
-                subject: "physics", 
-                title: "Đề thi thử Vật Lý chuyên KHTN",
-                questionsCount: 40,
-                time: 50,
-                img: "fa-atom", 
-                isVip: false
-            },
-            {
-                id: "thpt_hoa_01",
-                type: "THPT",
-                subject: "chemistry", 
-                title: "Đề thi thử Hóa Học THPT chuyên ĐH Vinh",
-                questionsCount: 40,
-                time: 50,
-                img: "fa-flask", 
-                isVip: true 
-            },
-            {
-                id: "thpt_sinh_01",
-                type: "THPT",
-                subject: "biology", 
-                title: "Đề thi thử Sinh Học SGD Bắc Ninh",
-                questionsCount: 40,
-                time: 50,
-                img: "fa-dna", 
-                isVip: false
+        // --- HÀM LỌC VÀ RENDER ĐỀ THI TSA ---
+        function filterTSA(category) {
+            document.querySelectorAll('.tsa-tab').forEach(tab => {
+                tab.classList.remove('bg-purple-50', 'text-purple-700');
+                tab.classList.add('text-gray-500', 'hover:bg-gray-50');
+            });
+            const activeTab = document.getElementById(`tab-tsa-${category}`);
+            if(activeTab) {
+                activeTab.classList.remove('text-gray-500', 'hover:bg-gray-50');
+                activeTab.classList.add('bg-purple-50', 'text-purple-700');
             }
-        ];
 
-        const allExamsData = {
-            "tsa_01": [
-                {
-                    id: 1, type: "true_false", 
-                    content: "Cho hàm số $y = f(x) = \\sqrt{1 + \\cos(x)}$. Khi ta xét $x \\in (0, \\pi)$, các nhận định dưới đây là đúng hay sai?",
-                    propositions: [
-                        "Phương trình $\\sqrt{1 + \\cos(x)} = \\cos\\left(\\frac{x}{2}\\right)$ có nghiệm",
-                        "Phương trình $\\sqrt{1 + \\cos(x)} = \\cos\\left(\\frac{x}{4}\\right)$ có nghiệm",
-                        "Phương trình $\\sqrt{1 + \\cos(x)} = \\cos\\left(\\frac{\\pi}{8}\\right)$ có đúng 01 nghiệm"
-                    ],
-                    correctAnswer: {0: 'true', 1: 'false', 2: 'true'}
-                },
-                {
-                    id: 2, type: "fill_blank", 
-                    content: "Bất phương trình $(\\log_2 x)^2 + \\log_3 \\frac{36}{x} \\leq \\left(1 + \\log_3 \\frac{36}{x}\\right) \\log_2 x$ có tập nghiệm là $x \\in [a, b]$. Giá trị của $a + b/2 =$",
-                    correctAnswer: "10"
-                },
-                {
-                    id: 7, type: "multiple_choice", 
-                    content: "Cho hàm số: $y = \\frac{1+x}{1-x}$. Nhận xét nào sau đây đúng?",
-                    options: [
-                        "A. Đồ thị hàm số có TCN $y = 1$, TCĐ $x = 1$",
-                        "B. Đồ thị hàm số có TCN $y = -1$, TCĐ $x = 1$",
-                        "C. Đồ thị hàm số có TCN $y = 1$, TCĐ $x = -1$",
-                        "D. Đồ thị hàm số có TCN $y = -1$, TCĐ $x = -1$"
-                    ],
-                    correctAnswer: "B"
-                }
-            ],
-            "tsa_02": [
-                {
-                    id: 101, type: "fill_blank",
-                    content: "Tính $l = \\lim_{x \\to 0} \\frac{1-\\cos 2x}{x} =$",
-                    correctAnswer: "0"
-                }
-            ],
-            "thpt_01": [
-                {
-                    id: 201, type: "multiple_choice",
-                    content: "Khảo sát một xe máy đang di chuyển trên đường trong vòng 6s cho biết vận tốc của xe đang di chuyển có biểu thức: $v_t = 12 + 4t - t^2(m/s)$. Xe có vận tốc lớn hơn $15\\ (m/s)$ trong khoảng thời gian nào?",
-                    options: [
-                        "A. $t \\in (1; 3)$",
-                        "B. $t \\in (0; 6)$",
-                        "C. $t \\in (2; 4)$",
-                        "D. $t \\in (3; 5)$"
-                    ],
-                    correctAnswer: "A"
-                },
-                {
-                    id: 202, type: "true_false", 
-                    content: "Cho hình chóp đều S.ABCD có $SA = 2$, $AB = 1$. Các nhận định sau đúng hay sai?",
-                    propositions: [
-                        "SA và CD không vuông góc nhau",
-                        "Góc giữa SA và CD là $30^o$",
-                        "Khoảng cách giữa SA và CD bằng 1",
-                        "Thể tích bằng 2/3"
-                    ],
-                    correctAnswer: {0: 'true', 1: 'false', 2: 'true', 3: 'false'}
-                }
-            ],
-            "thpt_toan_01": [
-                {
-                    id: 1, type: "multiple_choice",
-                    content: "Lâm trường Tam Đảo thống kê đường kính thân gỗ của 60 cây xoan đào được cho ở bảng sau:<br><table class='w-full text-center border-collapse border border-gray-300 mt-2 text-sm'><tr><th class='border border-gray-300 p-2'>Đường kính (cm)</th><td class='border border-gray-300 p-2'>[20; 22)</td><td class='border border-gray-300 p-2'>[22; 24)</td><td class='border border-gray-300 p-2'>[24; 26)</td><td class='border border-gray-300 p-2'>[26; 28)</td><td class='border border-gray-300 p-2'>[28; 30)</td></tr><tr><th class='border border-gray-300 p-2'>Tần số</th><td class='border border-gray-300 p-2'>5</td><td class='border border-gray-300 p-2'>20</td><td class='border border-gray-300 p-2'>18</td><td class='border border-gray-300 p-2'>7</td><td class='border border-gray-300 p-2'>10</td></tr></table><br>Nhóm chứa mốt của mẫu số liệu đã cho là:",
-                    options: ["A. [20; 22)", "B. [28; 30)", "C. [24; 26)", "D. [22; 24)"],
-                    correctAnswer: "D"
-                },
-                {
-                    id: 2, type: "multiple_choice",
-                    content: "Một hộp có 5 viên bi màu đỏ và 7 viên bi màu xanh. Lấy ngẫu nhiên 2 viên bi từ hộp đó. Xác suất để lấy được 2 viên bi màu đỏ bằng:",
-                    options: ["A. $\\frac{5}{33}$", "B. $\\frac{5}{22}$", "C. $\\frac{7}{33}$", "D. $\\frac{7}{22}$"],
-                    correctAnswer: "A"
-                },
-                {
-                    id: 3, type: "multiple_choice",
-                    content: "Trong không gian $Oxyz$, đường thẳng đi qua hai điểm $A(1; 2; 3), B(5; 4; -1)$ có phương trình chính tắc là:",
-                    options: [
-                        "A. $\\frac{x+1}{2} = \\frac{y+2}{1} = \\frac{z+3}{-2}$",
-                        "B. $\\frac{x-1}{2} = \\frac{y-2}{1} = \\frac{z-3}{2}$",
-                        "C. $\\frac{x+5}{-2} = \\frac{y+4}{-1} = \\frac{z-1}{2}$",
-                        "D. $\\frac{x-5}{2} = \\frac{y-4}{1} = \\frac{z+1}{-2}$"
-                    ],
-                    correctAnswer: "D"
-                },
-                {
-                    id: 4, type: "multiple_choice",
-                    content: "Cho $\\int_{2}^{5} f(x)dx = 2$ và $\\int_{2}^{5} g(x)dx = 5$. Giá trị của tích phân $\\int_{2}^{5} [f(x) - 2g(x)]dx$ bằng:",
-                    options: ["A. -8", "B. 12", "C. 1", "D. -3"],
-                    correctAnswer: "A"
-                },
-                {
-                    id: 5, type: "multiple_choice",
-                    content: "Biết phương trình $2x^2 + x + 3 = 1 - x$ có hai nghiệm phân biệt $x_1; x_2$. Tổng $x_1 + x_2$ bằng:",
-                    options: ["A. -3", "B. -1", "C. 2", "D. -2"],
-                    correctAnswer: "A"
-                },
-                {
-                    id: 6, type: "multiple_choice",
-                    content: "Cho cấp số cộng $(u_n)$ có $u_1 = -2$ và công sai $d = 3$. Giá trị của $u_{10}$ bằng:",
-                    options: ["A. $u_{10} = -39$", "B. $u_{10} = -29$", "C. $u_{10} = 25$", "D. $u_{10} = 28$"],
-                    correctAnswer: "C"
-                },
-                {
-                    id: 7, type: "multiple_choice",
-                    content: "Đạo hàm của hàm số $f(x) = \\sin x + \\cos(3x)$ là:",
-                    options: [
-                        "A. $f'(x) = -\\cos x + 3\\sin(3x)$",
-                        "B. $f'(x) = \\cos x - 3\\sin(3x)$",
-                        "C. $f'(x) = \\cos x + 3\\sin(3x)$",
-                        "D. $f'(x) = -\\cos x + \\sin(3x)$"
-                    ],
-                    correctAnswer: "B"
-                },
-                {
-                    id: 8, type: "multiple_choice",
-                    content: "Tập nghiệm của bất phương trình $\\log_{\\frac{1}{3}}(2x - 1) > -2$ là:",
-                    options: ["A. $(\\frac{1}{2}; 5)$", "B. $(\\frac{1}{2}; +\\infty)$", "C. $(5; +\\infty)$", "D. $(-\\infty; 5)$"],
-                    correctAnswer: "A"
-                },
-                {
-                    id: 9, type: "multiple_choice",
-                    content: "Cho hàm số $y = f(x)$ có đạo hàm là $f'(x) = (x - 1)(x - 2)^2(x + 3), \\forall x \\in \\mathbb{R}$. Số điểm cực trị của hàm số đã cho là:",
-                    options: ["A. 2", "B. 3", "C. 1", "D. 0"],
-                    correctAnswer: "A"
-                },
-                {
-                    id: 10, type: "multiple_choice",
-                    content: "Giá trị lớn nhất của hàm số $f(x) = \\frac{2x + 3}{x - 1}$ trên đoạn $[2; 5]$ bằng:",
-                    options: ["A. $\\frac{13}{4}$", "B. 5", "C. 7", "D. 2"],
-                    correctAnswer: "C"
-                },
-                {
-                    id: 11, type: "multiple_choice",
-                    content: "Tập nghiệm của phương trình $\\sin x = 0$ là:",
-                    options: [
-                        "A. $S = \\left\\{\\frac{\\pi}{2} + k\\pi, k \\in \\mathbb{Z}\\right\\}$",
-                        "B. $S = \\{k\\pi, k \\in \\mathbb{Z}\\}$",
-                        "C. $S = \\{k2\\pi, k \\in \\mathbb{Z}\\}$",
-                        "D. $S = \\{\\pi + k2\\pi, k \\in \\mathbb{Z}\\}$"
-                    ],
-                    correctAnswer: "B"
-                },
-                {
-                    id: 12, type: "multiple_choice",
-                    content: "Cho hình hộp chữ nhật $ABCD.A'B'C'D'$ có $AB = 2, AD = 3, AA' = 6$. Độ dài vectơ $\\overrightarrow{AB} + \\overrightarrow{AD} + \\overrightarrow{AA'}$ bằng:",
-                    options: ["A. 7", "B. $7\\sqrt{3}$", "C. $11\\sqrt{3}$", "D. 11"],
-                    correctAnswer: "A"
-                },
-                {
-                    id: 13, type: "true_false",
-                    content: "Trong không gian $Oxyz$, cho $A(0; 1; 1)$, $B(1; 0; -3)$, $C(-1; -2; -3)$ và mặt cầu $(S)$ có phương trình $x^2 + y^2 + z^2 - 2x + 2z - 2 = 0$.",
-                    propositions: [
-                        "$\\overrightarrow{AB} = (1; -1; -4)$",
-                        "Mặt phẳng $(ABC)$ có phương trình $2x - 2y + z - 1 = 0$",
-                        "Mặt phẳng $(ABC)$ cắt mặt cầu $(S)$ theo một đường tròn có bán kính bằng $\\frac{4\\sqrt{2}}{3}$",
-                        "Điểm $G(a; b; c)$ là trọng tâm của tam giác $ABC$ thì $a + b + c = 2$"
-                    ],
-                    correctAnswer: {0: "true", 1: "false", 2: "true", 3: "false"}
-                },
-                {
-                    id: 14, type: "true_false",
-                    content: "Một cây cà chua khi mới trồng có chiều cao 15cm. Gọi $h(t)$ là chiều cao của cây tại thời điểm đúng $t$ tuần sau khi trồng ($0 \\le t \\le 16$). Tốc độ tăng chiều cao được cho bởi hàm số $h'(t) = -0.02t^3 + 0.32t^2$ (cm/tuần).",
-                    propositions: [
-                        "Tại thời điểm đúng $t$ tuần sau khi trồng, chiều cao của cây là $h(t) = -\\frac{t^4}{200} + \\frac{32t^3}{300}$ (cm)",
-                        "Tại thời điểm tốc độ tăng chiều cao lớn nhất, cây cao hơn 80cm",
-                        "Trong khoảng thời gian 10 tuần đầu, tốc độ tăng chiều cao trung bình lớn hơn 5.6 (cm/tuần)",
-                        "Tại thời điểm đúng 6 tuần sau khi trồng, chiều cao của cây cà chua là 31.56 (cm)"
-                    ],
-                    correctAnswer: {0: "false", 1: "false", 2: "true", 3: "true"}
-                },
-                {
-                    id: 15, type: "true_false",
-                    content: "Một công ty đấu thầu hai dự án. Xác suất trúng thầu dự án thứ nhất là 0.8. Nếu trúng thầu dự án 1 thì xác suất trúng thầu dự án 2 là 0.9. Nếu không trúng thầu dự án 1 thì xác suất trúng thầu dự án 2 là 0.2.",
-                    propositions: [
-                        "Xác suất để công ty không trúng thầu dự án thứ nhất là 0.2",
-                        "Xác suất để công ty trúng thầu dự án thứ hai là 0.76",
-                        "Xác suất để công ty trúng thầu cả hai dự án là 0.72",
-                        "Nếu công ty không trúng thầu dự án thứ hai thì xác suất trúng thầu dự án thứ nhất là 0.12"
-                    ],
-                    correctAnswer: {0: "true", 1: "true", 2: "true", 3: "false"}
-                },
-                {
-                    id: 16, type: "true_false",
-                    content: "Cho hàm số $y = \\frac{x^2 - 3x + 6}{x - 1}$.",
-                    propositions: [
-                        "Đường tiệm cận xiên của đồ thị hàm số là đường thẳng $y = ax + b$. Khi đó $a - 2b = 5$",
-                        "Đường thẳng đi qua hai điểm cực trị của đồ thị hàm số có phương trình là $y = 2x - 3$",
-                        "Gọi $A, B$ lần lượt là các điểm cực đại, cực tiểu của đồ thị hàm số và $O$ là gốc tọa độ. Diện tích tam giác $OAB$ bằng 6",
-                        "Hàm số nghịch biến trên khoảng $(-1; 3)$"
-                    ],
-                    correctAnswer: {0: "true", 1: "true", 2: "true", 3: "false"}
-                },
-                {
-                    id: 17, type: "fill_blank",
-                    content: "Nếu một doanh nghiệp sản xuất $x$ sản phẩm trong một tháng ($x \\in \\mathbb{N}^*, 1 \\le x \\le 5000$) thì doanh thu là $F(x) = -0.03x^2 + 800x$ (nghìn đồng), chi phí sản xuất bình quân là $G(x) = \\frac{50000}{x} + 450$ (nghìn đồng). Trong một tháng, doanh nghiệp đó cần sản xuất ít nhất bao nhiêu sản phẩm để lợi nhuận thu được lớn hơn 100 triệu đồng?",
-                    correctAnswer: "446"
-                },
-                {
-                    id: 18, type: "fill_blank",
-                    content: "Cho hình lăng trụ $ABCD.A'B'C'D'$ có đáy $ABCD$ là hình thoi, $\\widehat{ABC} = 60^\\circ$. Biết $CA' = CB' = CC'$. Góc giữa $(BCC'B')$ và $(ABC)$ bằng $45^\\circ$. Khoảng cách giữa $AA'$ và $BC$ bằng $6\\sqrt{3}$. Thể tích khối lăng trụ đã cho bằng $a\\sqrt{2}$, giá trị của $a$ bằng bao nhiêu?",
-                    correctAnswer: "864"
-                },
-                {
-                    id: 19, type: "fill_blank",
-                    content: "Cho hình hộp $ABCD.A'B'C'D'$ có $AB = 3, AD = 4, AA' = 5$. Biết $\\widehat{BAD} = 90^\\circ$, $\\widehat{BAA'} = \\widehat{DAA'} = 60^\\circ$. Số đo góc giữa hai vectơ $\\overrightarrow{AC'}$ và $\\overrightarrow{DC'}$ bằng bao nhiêu độ? (Làm tròn kết quả đến hàng đơn vị).",
-                    correctAnswer: "130"
-                },
-                {
-                    id: 20, type: "fill_blank",
-                    content: "Bạn Minh dùng một miếng bìa hình vuông $ABCD$ cạnh $40cm$ cắt để làm một chiếc đèn lồng gồm ba phần: Phần thân là lăng trụ tứ giác đều, hai đầu là hai hình chóp tứ giác đều. Thể tích lớn nhất của chiếc đèn bằng bao nhiêu $cm^3$? (Làm tròn kết quả đến hàng đơn vị).",
-                    correctAnswer: "3057"
-                },
-                {
-                    id: 21, type: "fill_blank",
-                    content: "Có hai trục $Ox, Oy$ đặt trên mặt đất; tia $Oz$ hướng lên trên (đơn vị: km). Một Ra đa tại $A(12; 8; 3)$ có khả năng phát hiện thiết bị trong vòng bán kính 30km. UAV bay từ $M(72; 28; 3)$ đến $N(-32; -30; 3)$ với vận tốc không đổi là 240km/h. Hình ảnh của UAV xuất hiện trên màn hình Ra đa bao nhiêu phút? (Làm tròn đến hàng đơn vị).",
-                    correctAnswer: "14"
-                },
-                {
-                    id: 22, type: "fill_blank",
-                    content: "Cho hình nón có bán kính đáy $OA = 6cm$ và chiều cao $SO = 8cm$. Cắt hình nón bởi mặt phẳng song song với trục $SO$ và cách trục $SO$ khoảng 3cm. Thể tích phần không chứa đỉnh $S$ bằng bao nhiêu $cm^3$? (Làm tròn đến hàng phần chục).",
-                    correctAnswer: "33.2"
-                }
-            ],
-            "thpt_toan_02": [
-                // --- PHẦN I: CÂU TRẮC NGHIỆM 4 LỰA CHỌN (12 CÂU) ---
-                {
-                    id: 501, type: "multiple_choice",
-                    content: "Cho cấp số cộng $(u_n)$ có $u_1=5$ và công sai $d=-1$. Giá trị của $u_2$ bằng <!--[cite: 2, 6] -->",
-                    options: ["A. 4.", "B. -5.", "C. 5.", "D. -4."],
-                    correctAnswer: "A"
-                },
-                {
-                    id: 502, type: "multiple_choice",
-                    content: "Cho các hàm số $y=f(x)$ và $y=g(x)$ có đạo hàm trên tập số thực $\\mathbb{R}$ thỏa mãn $f'(x)=x$ và $g'(x)=x^2$. Đạo hàm của hàm số $y=f(x)+g(x)$ là <!--[cite: 2, 6] -->",
-                    options: ["A. $3x$.", "B. $1+x^2$.", "C. $x+x^2$.", "D. $1+2x$."],
-                    correctAnswer: "C"
-                },
-                {
-                    id: 503, type: "multiple_choice",
-                    content: "Cho $\\int f(x)dx = \\sin x + C$. Phát biểu nào sau đây là đúng? <!--[cite: 2, 6] -->",
-                    options: [
-                        "A. $\\int [3+f(x)]dx = 3x + \\cos x + C$.", 
-                        "B. $\\int [3+f(x)]dx = 3x + \\sin x + C$.", 
-                        "C. $\\int [3+f(x)]dx = 3x - \\cos x + C$.", 
-                        "D. $\\int [3+f(x)]dx = 3x - \\sin x + C$."
-                    ],
-                    correctAnswer: "B"
-                },
-                {
-                    id: 504, type: "multiple_choice",
-                    content: "Nghiệm của phương trình $\\log_3(x-1)=1$ là <!--[cite: 2, 6] -->",
-                    options: ["A. $x=2$.", "B. $x=3$.", "C. $x=5$.", "D. $x=4$."],
-                    correctAnswer: "D"
-                },
-                {
-                    id: 505, type: "multiple_choice",
-                    content: "Trong không gian với hệ tọa độ $Oxyz$, cho hai điểm $A(1;5;1)$ và $B(3;3;1)$. Vectơ $\\overrightarrow{AB}$ có tọa độ là <!--[cite: 2, 6] -->",
-                    options: ["A. $(2;-2;0)$.", "B. $(-2;2;0)$.", "C. $(4;8;2)$.", "D. $(2;4;1)$."],
-                    correctAnswer: "A"
-                },
-                {
-                    id: 506, type: "multiple_choice",
-                    content: "Cho hai biến cố độc lập $A$ và $B$ có xác suất thỏa mãn $P(A)=0,5$ và $P(B)=0,4$. Giá trị của $P(AB)$ bằng <!--[cite: 2, 6] -->",
-                    options: ["A. 0,8.", "B. 0,1.", "C. 0,9.", "D. 0,2."],
-                    correctAnswer: "D"
-                },
-                {
-                    id: 507, type: "multiple_choice",
-                    content: "Cho hình lập phương $ABCD.A'B'C'D'$ (xem hình dưới). Vectơ nào sau đây bằng vectơ $\\overrightarrow{AB}$?<br><img src='https://i.postimg.cc/GpwpRfVD/c7.png' class='mt-4 mb-4 w-full max-w-sm mx-auto rounded-lg border border-gray-200 shadow-sm'> <!--[cite: 2, 6] -->",
-                    options: ["A. $\\overrightarrow{AA'}$.", "B. $\\overrightarrow{D'C'}$.", "C. $\\overrightarrow{CD}$.", "D. $\\overrightarrow{AD}$."],
-                    correctAnswer: "B"
-                },
-                {
-                    id: 508, type: "multiple_choice",
-                    content: "Cặp số nào sau đây là nghiệm của hệ bất phương trình $\\begin{cases}x+y-3<0\\\\ x-y+1>0\\end{cases}$? <!--[cite: 2, 7] -->",
-                    options: ["A. $(1;0)$.", "B. $(0;2)$.", "C. $(-1;1)$.", "D. $(1;2)$."],
-                    correctAnswer: "A"
-                },
-                {
-                    id: 509, type: "multiple_choice",
-                    content: "Hàm số $F(x)=4x^3$ là một nguyên hàm của hàm số nào sau đây? <!--[cite: 2, 7] -->",
-                    options: ["A. $f_2(x)=3x^2$.", "B. $f_3(x)=12x^2$.", "C. $f_1(x)=x^4$.", "D. $f_4(x)=4x^4$."],
-                    correctAnswer: "B"
-                },
-                {
-                    id: 510, type: "multiple_choice",
-                    content: "Cho hàm số $y=\\frac{ax+b}{cx+d}$ có bảng biến thiên như hình dưới đây:<br><img src='https://i.postimg.cc/4NW8rk7s/c10-t.png' class='mt-4 mb-4 w-full max-w-xl mx-auto rounded-lg border border-gray-200 shadow-sm'><br>Đường tiệm cận ngang của đồ thị hàm số đã cho có phương trình là <!--[cite: 2, 7] -->",
-                    options: ["A. $y=-2$.", "B. $x=-2$.", "C. $x=1$.", "D. $y=1$."],
-                    correctAnswer: "A"
-                },
-                {
-                    id: 511, type: "multiple_choice",
-                    content: "Cho cấp số nhân $(u_n)$ có số hạng đầu $u_1$ và công bội $q$ với $u_1 \\neq 0, q>1$. Số hạng $u_4$ là <!--[cite: 3, 7] -->",
-                    options: ["A. $u_4=u_1 \\cdot q^3$.", "B. $u_4=u_1 \\cdot q^4$.", "C. $u_4=u_1+3q$.", "D. $u_4=u_1+4q$."],
-                    correctAnswer: "A"
-                },
-                {
-                    id: 512, type: "multiple_choice",
-                    content: "Khảo sát thời gian (đơn vị: phút) học trực tuyến trong một ngày của 42 học sinh, người ta thu được mẫu số liệu ghép nhóm như sau:<br><table class='w-full text-center border-collapse border border-gray-300 mt-2 text-sm'><tr><th class='border border-gray-300 p-2'>Thời gian</th><td class='border border-gray-300 p-2'>[10;20)</td><td class='border border-gray-300 p-2'>[20;30)</td><td class='border border-gray-300 p-2'>[30;40)</td><td class='border border-gray-300 p-2'>[40;50)</td><td class='border border-gray-300 p-2'>[50;60)</td><td class='border border-gray-300 p-2'>[60;70)</td></tr><tr><th class='border border-gray-300 p-2'>Số học sinh</th><td class='border border-gray-300 p-2'>4</td><td class='border border-gray-300 p-2'>8</td><td class='border border-gray-300 p-2'>14</td><td class='border border-gray-300 p-2'>7</td><td class='border border-gray-300 p-2'>4</td><td class='border border-gray-300 p-2'>5</td></tr></table><br>Trung vị của mẫu số liệu trên thuộc nhóm nào sau đây? <!--[cite: 3, 7] -->",
-                    options: ["A. $[30;40)$.", "B. $[40;50)$.", "C. $[60;70)$.", "D. $[50;60)$."],
-                    correctAnswer: "A"
-                },
-
-                // --- PHẦN II: CÂU TRẮC NGHIỆM ĐÚNG/SAI (4 CÂU) ---
-                {
-                    id: 513, type: "true_false",
-                    content: "Kết quả quét thử nghiệm hồ sơ y tế của 10000 người: 1000 người nhận cảnh báo (trong đó 700 bệnh, 300 không bệnh); 9000 người không nhận cảnh báo (trong đó 100 bệnh, 8900 không bệnh). Chọn ngẫu nhiên 1 người: <!--[cite: 3, 7] -->",
-                    propositions: [
-                        "Xác suất để người đó không nhận được cảnh báo từ ứng dụng bằng 0,9. <!--[cite: 3, 8] -->",
-                        "Xác suất để người đó không có bệnh, biết rằng người đó không nhận được cảnh báo, lớn hơn 0,98. <!--[cite: 3, 8] -->",
-                        "Xác suất để người đó không có bệnh bằng 0,9. <!--[cite: 3, 8] -->",
-                        "Xác suất để người đó không nhận được cảnh báo, biết rằng người đó không có bệnh, nhỏ hơn 0,95. <!--[cite: 3, 8] -->"
-                    ],
-                    correctAnswer: {0: 'true', 1: 'true', 2: 'false', 3: 'false'}
-                },
-                {
-                    id: 514, type: "true_false",
-                    content: "Cho hàm số $f(x)=\\frac{1}{3}x^3-5x^2+9x+8$. <!--[cite: 3, 8] -->",
-                    propositions: [
-                        "Hàm số đã cho có đạo hàm là $f'(x)=x^2-10x+9$. <!--[cite: 3, 8] -->",
-                        "Phương trình $f'(x)=0$ có tập nghiệm là $S=\\{1;9\\}$. <!--[cite: 3, 8] -->",
-                        "Hàm số đã cho nghịch biến trên khoảng $(1;9)$. <!--[cite: 3, 8] -->",
-                        "Giá trị cực tiểu của hàm số đã cho bằng $\\frac{37}{3}$. <!--[cite: 3, 8] -->"
-                    ],
-                    correctAnswer: {0: 'true', 1: 'true', 2: 'true', 3: 'false'}
-                },
-                {
-                    id: 515, type: "true_false",
-                    content: "Một hệ thống pin năng lượng mặt trời có năng lượng điện lưu trữ là $F(t)$ (kWh) với $F(0)=0$. Tốc độ lưu trữ năng lượng là $f(t)=F'(t) = -0,3t^2 + 3,6t$ (kW) với $0 \\le t \\le 12$. <!--[cite: 3, 8] -->",
-                    propositions: [
-                        "$F(t)=-0,1t^3+1,8t^2$ với $0 \\le t \\le 12$. <!--[cite: 3, 8] -->",
-                        "Năng lượng lưu trữ được kể từ thời điểm $t=a$ đến $t=b$ là $\\int_{a}^{b} f(t)dt$. <!--[cite: 3, 8] -->",
-                        "Năng lượng điện lưu trữ được kể từ thời điểm $t=1$ đến $t=4$ nhỏ hơn 20,6 kWh. <!--[cite: 3, 8] -->",
-                        "Năng lượng lưu trữ được từ $t=1$ đến $t=7$ gấp hai lần năng lượng lưu trữ được từ $t=1$ đến $t=4$. <!--[cite: 3, 9] -->"
-                    ],
-                    correctAnswer: {0: 'true', 1: 'true', 2: 'false', 3: 'false'}
-                },
-                {
-                    id: 516, type: "true_false",
-                    content: "Trong hệ tọa độ $Oxyz$ (1 đơn vị = 10m). Vành đai bảo vệ mục tiêu $O$ là đường tròn tâm $O$, bán kính 7 đơn vị trên $(Oxy)$. Máy bay bay theo đường thẳng từ $M(5;10;4)$ đến $N(14;-2;4)$. <!--[cite: 4, 9] -->",
-                    propositions: [
-                        "$\\overrightarrow{MN}=(9;-12;0)$. <!--[cite: 4, 9] -->",
-                        "Phương trình tham số của $MN$ là $\\begin{cases}x=5+3t\\\\ y=10-4t\\\\ z=0\\end{cases}$ với $t \\in \\mathbb{R}$. <!--[cite: 4, 9] -->",
-                        "Khoảng cách ngắn nhất từ máy bay đến vành đai bảo vệ là 50 mét. <!--[cite: 4, 9] -->",
-                        "Khoảng cách đạt giá trị nhỏ nhất khi máy bay ở tọa độ $(8;6;4)$. <!--[cite: 4, 9] -->"
-                    ],
-                    correctAnswer: {0: 'true', 1: 'false', 2: 'true', 3: 'true'}
-                },
-
-                // --- PHẦN III: CÂU TRẢ LỜI NGẮN (6 CÂU) ---
-                {
-                    id: 517, type: "fill_blank",
-                    content: "Cho hình lập phương $ABCD.MNPQ$ có cạnh bằng 6. Gọi $E$ là trung điểm của đoạn thẳng $AB$. Khoảng cách từ điểm $P$ đến mặt phẳng $(MED)$ bằng bao nhiêu (làm tròn kết quả đến hàng phần trăm)? <!--[cite: 4, 10] -->",
-                    correctAnswer: "7.35"
-                },
-                {
-                    id: 518, type: "fill_blank",
-                    content: "Bình cần điền 15 số $\\{0;1;2;3;4;5;6;7;8;10;11;12;15;16;20\\}$ vào 15 ô vuông dạng bậc thang sao cho: Hiệu hai số ở 2 ô khác nhau trên cùng 1 hàng hoặc 1 cột không chia hết cho 5.<br><img src='https://i.postimg.cc/dtC2jb2n/ovuong.png' class='mt-4 mb-4 w-full max-w-sm mx-auto rounded-lg border border-gray-200 shadow-sm'><br>Gọi $H$ là số cách điền khác nhau. Giá trị của $\\frac{H}{30}$ bằng bao nhiêu? <!--[cite: 4, 11] -->",
-                    correctAnswer: "1152"
-                },
-                {
-                    id: 519, type: "fill_blank",
-                    content: "Khối vật thể tạo thành khi quay nửa trên elip $\\frac{x^2}{1,5^2}+\\frac{y^2}{1^2}=1$ quanh trục $Ox$. Lỗ khoan trụ dọc trục có bán kính $0,2$cm.<br><img src='https://i.postimg.cc/W4z7RXqV/tt.png' class='mt-4 mb-4 w-full max-w-2xl mx-auto rounded-lg border border-gray-200 shadow-sm'><br>Thể tích của hạt cườm đó bằng bao nhiêu $cm^3$ (làm tròn đến hàng phần trăm)? <!--[cite: 4, 11] -->",
-                    correctAnswer: "5.91"
-                },
-                {
-                    id: 520, type: "fill_blank",
-                    content: "Khung hình đa giác đều 12 cạnh $A_1A_2...A_{12}$. Lắp ngẫu nhiên 12 bóng (4 đỏ, 8 xanh) vào 12 đỉnh. Gọi $P$ là xác suất để mỗi hình vuông (tạo từ 4 đỉnh đa giác) đều có ít nhất 1 bóng đỏ. Giá trị của $3190P$ bằng bao nhiêu?<img src='https://i.postimg.cc/nV3cr2Ck/vv.png' class='mt-4 mb-4 w-full max-w-xl mx-auto rounded-lg border border-gray-200 shadow-sm'><!--[cite: 5, 12] -->",
-                    correctAnswer: "1856"
-                },
-                {
-                    id: 521, type: "fill_blank",
-                    content: "Số liệu bán hàng (kg và nghìn đồng):<br><table class='w-full text-center border-collapse border border-gray-300 mt-2 text-sm'><tr><th class='border border-gray-300 p-2'>Ngày</th><th class='border border-gray-300 p-2'>Rau muống</th><th class='border border-gray-300 p-2'>Bí xanh</th><th class='border border-gray-300 p-2'>Cà chua</th><th class='border border-gray-300 p-2'>Tổng tiền</th></tr><tr><td class='border border-gray-300 p-2'>Thứ 4</td><td class='border border-gray-300 p-2'>19</td><td class='border border-gray-300 p-2'>14</td><td class='border border-gray-300 p-2'>10</td><td class='border border-gray-300 p-2'>600</td></tr><tr><td class='border border-gray-300 p-2'>Thứ 5</td><td class='border border-gray-300 p-2'>20</td><td class='border border-gray-300 p-2'>12</td><td class='border border-gray-300 p-2'>8</td><td class='border border-gray-300 p-2'>540</td></tr><tr><td class='border border-gray-300 p-2'>Thứ 6</td><td class='border border-gray-300 p-2'>25</td><td class='border border-gray-300 p-2'>12</td><td class='border border-gray-300 p-2'>7</td><td class='border border-gray-300 p-2'>570</td></tr><tr><td class='border border-gray-300 p-2'>Thứ 7</td><td class='border border-gray-300 p-2'>50</td><td class='border border-gray-300 p-2'>25</td><td class='border border-gray-300 p-2'>20</td><td class='border border-gray-300 p-2'>?</td></tr></table><br>Biết đơn giá không đổi, tổng tiền thu được ngày thứ Bảy là bao nhiêu? <!--[cite: 5, 12] -->",
-                    correctAnswer: "1275"
-                },
-                {
-                    id: 522, type: "fill_blank",
-                    content: "Công ty chế biến $x$ tấn nguyên liệu ($1 \\le x \\le 200$), chi phí $C(x)=0,001x^3+30x+10$ (triệu) và doanh thu $R(x)=60x$ (triệu). Lợi nhuận lớn nhất công ty đạt được trong một tháng là bao nhiêu triệu đồng? <!--[cite: 5, 13] -->",
-                    correctAnswer: "1990"
-                }
-            ],
-        };
-
-        // --- HÀM TỰ ĐỘNG SINH UI DANH SÁCH ĐỀ THI ---
-        function renderExamLists() {
             const tsaContainer = document.getElementById('tsa-exam-container');
             tsaContainer.innerHTML = '';
+            
+            const filteredExams = examsMeta.filter(exam => exam.type === 'TSA' && exam.category === category);
 
-            // 1. Chỉ render các đề TSA vào thẻ TSA
-            examsMeta.forEach(exam => {
-                if (exam.type === 'TSA') {
-                    let cardHTML = `
-                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col hover:shadow-md transition">
-                        <div class="relative h-48 bg-gray-200">
-                            <img src="${exam.img}" class="w-full h-full object-cover" alt="Cover">
-                            ${exam.isVip ? '<div class="absolute top-3 right-3 bg-yellow-400 text-yellow-900 text-xs font-bold px-3 py-1.5 rounded-full flex items-center gap-1"><i class="fa-solid fa-crown"></i> VIP</div>' : ''}
-                        </div>
-                        <div class="p-5 flex flex-col flex-1">
-                            <h3 class="text-lg font-bold text-gray-800 mb-4 mt-2">${exam.title}</h3>
-                            <div class="flex gap-4 mb-6 text-sm text-gray-600 mt-auto">
-                                <div class="flex items-center gap-2">
-                                    <div class="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-blue-500"><i class="fa-regular fa-circle-question"></i></div>
-                                    <div><span class="block text-[10px] text-gray-400 uppercase">Câu hỏi</span><span class="font-bold">${exam.questionsCount} câu</span></div>
-                                </div>
-                                <div class="flex items-center gap-2">
-                                    <div class="w-8 h-8 rounded-full bg-green-50 flex items-center justify-center text-green-500"><i class="fa-regular fa-clock"></i></div>
-                                    <div><span class="block text-[10px] text-gray-400 uppercase">Thời gian</span><span class="font-bold">${exam.time} phút</span></div>
-                                </div>
+            if (filteredExams.length === 0) {
+                tsaContainer.innerHTML = `<div class="col-span-full py-12 text-center text-gray-500 bg-white rounded-2xl border border-gray-100 font-semibold shadow-sm">Chưa có đề thi nào trong mục này.</div>`;
+                return;
+            }
+
+            filteredExams.forEach(exam => {
+                let cardHTML = `
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col hover:shadow-md transition">
+                    <div class="relative h-48 bg-gray-200">
+                        <img src="${exam.img || 'https://via.placeholder.com/400x200?text=Cover'}" class="w-full h-full object-cover" alt="Cover">
+                        ${exam.isVip ? '<div class="absolute top-3 right-3 bg-yellow-400 text-yellow-900 text-xs font-bold px-3 py-1.5 rounded-full flex items-center gap-1"><i class="fa-solid fa-crown"></i> VIP</div>' : ''}
+                    </div>
+                    <div class="p-5 flex flex-col flex-1">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4 mt-2">${exam.title}</h3>
+                        <div class="flex gap-4 mb-6 text-sm text-gray-600 mt-auto">
+                            <div class="flex items-center gap-2">
+                                <div class="w-8 h-8 rounded-full bg-purple-50 flex items-center justify-center text-purple-600"><i class="fa-regular fa-circle-question"></i></div>
+                                <div><span class="block text-[10px] text-gray-400 uppercase">Câu hỏi</span><span class="font-bold">${exam.questionsCount} câu</span></div>
                             </div>
-                            <button onclick="openConfirmModal('${exam.id}')" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2.5 rounded-lg transition-colors text-sm">Bắt đầu thi</button>
+                            <div class="flex items-center gap-2">
+                                <div class="w-8 h-8 rounded-full bg-green-50 flex items-center justify-center text-green-500"><i class="fa-regular fa-clock"></i></div>
+                                <div><span class="block text-[10px] text-gray-400 uppercase">Thời gian</span><span class="font-bold">${exam.time} phút</span></div>
+                            </div>
                         </div>
-                    </div>`;
-                    tsaContainer.innerHTML += cardHTML;
-                }
+                        <button onclick="openConfirmModal('${exam.id}')" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2.5 rounded-lg transition-colors text-sm">Bắt đầu thi</button>
+                    </div>
+                </div>`;
+                tsaContainer.innerHTML += cardHTML;
             });
-
-            // 2. Tự động tải tab Toán Học (math) đầu tiên cho khu vực THPT
-            filterTHPT('math');
         }
 
         // --- HÀM LỌC VÀ RENDER 4 MÔN THPT ---
         function filterTHPT(subject) {
-            // 1. Reset màu các nút tab
             document.querySelectorAll('.thpt-tab').forEach(tab => {
                 tab.classList.remove('bg-blue-50', 'text-blue-700');
                 tab.classList.add('text-gray-500', 'hover:bg-gray-50');
             });
-            // Tô màu nút đang chọn
             const activeTab = document.getElementById(`tab-${subject}`);
             if(activeTab) {
                 activeTab.classList.remove('text-gray-500', 'hover:bg-gray-50');
                 activeTab.classList.add('bg-blue-50', 'text-blue-700');
             }
 
-            // 2. Lọc đề theo môn
             const thptContainer = document.getElementById('thpt-exam-container');
             thptContainer.innerHTML = '';
             const filteredExams = examsMeta.filter(exam => exam.type === 'THPT' && exam.subject === subject);
 
-            // 3. Nếu chưa có đề, hiển thị thông báo
             if (filteredExams.length === 0) {
                 thptContainer.innerHTML = `<div class="col-span-full py-12 text-center text-gray-500 bg-white rounded-2xl border border-gray-100 font-semibold shadow-sm">Chưa có đề thi nào trong mục này.</div>`;
                 return;
             }
 
-            // 4. In các đề tìm thấy ra HTML
             filteredExams.forEach(exam => {
                 let cardHTML = `
                 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col hover:shadow-md transition">
@@ -1198,6 +869,12 @@
                 </div>`;
                 thptContainer.innerHTML += cardHTML;
             });
+        }
+
+        // --- HÀM TỰ ĐỘNG SINH UI DANH SÁCH ĐỀ THI ---
+        function renderExamLists() {
+            filterTSA('math'); // Mặc định hiển thị tab Toán của TSA
+            filterTHPT('math'); // Mặc định hiển thị tab Toán của THPT
         }
 
         // --- HỆ THỐNG ĐĂNG NHẬP ---
@@ -1231,7 +908,9 @@
                 existingUsers[email] = {
                     name: document.getElementById('reg-name').value,
                     password: document.getElementById('reg-password').value,
-                    documents: [], dob: '', phone: '', school: '', className: '', examHistory: []
+                    documents: [], dob: '', phone: '', school: '', className: '', examHistory: [],
+                    streak: 0,
+                    lastExamDate: null
                 };
                 localStorage.setItem('yaecute_users', JSON.stringify(existingUsers));
                 alert("Đăng ký thành công! Vui lòng đăng nhập.");
@@ -1248,7 +927,7 @@
 
             if (email === 'admin@gmail.com' && !existingUsers['admin@gmail.com']) {
                 existingUsers['admin@gmail.com'] = { 
-                    name: 'Admin VIP', password: '123', documents: [], dob: '2005-01-01', phone: '0987654321', school: 'HUST', className: 'CNTT', examHistory: []
+                    name: 'Admin VIP', password: '123', documents: [], dob: '2005-01-01', phone: '0987654321', school: 'HUST', className: 'CNTT', examHistory: [], streak: 0, lastExamDate: null
                 };
                 localStorage.setItem('yaecute_users', JSON.stringify(existingUsers));
             }
@@ -1256,15 +935,16 @@
             if (existingUsers[email] && existingUsers[email].password === password) {
                 currentSessionEmail = email;
                 currentUser = existingUsers[email];
-                if(!currentUser.examHistory) currentUser.examHistory = []; // fix cũ
+                if(!currentUser.examHistory) currentUser.examHistory = []; 
                 
+                checkAndUpdateStreakOnLogin();
+
                 document.getElementById('display-user-name').textContent = currentUser.name;
                 document.getElementById('display-user-avatar').textContent = currentUser.name.charAt(0).toUpperCase();
                 
                 document.getElementById('view-auth').classList.add('hidden');
                 document.getElementById('app-container').classList.replace('hidden', 'flex');
                 
-                // Khởi tạo danh sách đề thi và lịch sử ngay khi login
                 renderExamLists();
                 switchView('home');
             } else {
@@ -1287,7 +967,6 @@
             document.getElementById('profile-dropdown').classList.add('hidden');
             const views = ['view-home', 'view-exam-list', 'view-exam-school-list', 'view-realtime-exam', 'view-documents', 'view-settings', 'view-history'];
             
-            // 1. Ẩn tất cả các view và gỡ bỏ class hiệu ứng
             views.forEach(v => {
                 let el = document.getElementById(v);
                 if(el) { 
@@ -1299,11 +978,13 @@
 
             let targetView = null;
 
-            // 2. Kích hoạt class Layout tương ứng
             if (viewName === 'home') {
                 targetView = document.getElementById('view-home');
                 targetView.classList.add('block');
                 document.getElementById('nav-home').classList.add('active');
+                
+                renderStreakLeaderboard(); 
+                
             } else if (viewName === 'exam-list') {
                 targetView = document.getElementById('view-exam-list');
                 targetView.classList.add('block');
@@ -1339,12 +1020,68 @@
                 renderExamHistory();
             }
 
-            // 3. Hiển thị View và Kích hoạt lại hiệu ứng chuyển cảnh
             if (targetView) {
                 targetView.classList.remove('hidden');
-                void targetView.offsetWidth; // Trick force reflow: Ép trình duyệt chạy lại animation
+                void targetView.offsetWidth; 
                 targetView.classList.add('animate-view');
             }
+        }
+
+        // --- BẢNG XẾP HẠNG CHUỖI HỌC TẬP ---
+        function renderStreakLeaderboard() {
+            const listContainer = document.getElementById('streak-leaderboard-list');
+            if (!listContainer) return;
+
+            const usersObj = JSON.parse(localStorage.getItem('yaecute_users')) || {};
+            const usersArray = [];
+
+            for (const email in usersObj) {
+                usersArray.push({
+                    email: email,
+                    name: usersObj[email].name || 'Học viên ẩn danh',
+                    streak: usersObj[email].streak || 0
+                });
+            }
+
+            usersArray.sort((a, b) => b.streak - a.streak);
+            const topUsers = usersArray.slice(0, 5);
+            listContainer.innerHTML = '';
+
+            if (topUsers.length === 0 || topUsers.every(u => u.streak === 0)) {
+                listContainer.innerHTML = '<li class="p-8 text-center text-gray-500">Chưa có ai đạt chuỗi học tập. Hãy là người đầu tiên! 🔥</li>';
+                return;
+            }
+
+            topUsers.forEach((user, index) => {
+                let rankIcon = '';
+                if (index === 0) rankIcon = '<i class="fa-solid fa-trophy text-yellow-400 text-2xl drop-shadow-md"></i>';
+                else if (index === 1) rankIcon = '<i class="fa-solid fa-medal text-gray-300 text-xl"></i>';
+                else if (index === 2) rankIcon = '<i class="fa-solid fa-medal text-orange-400 text-xl"></i>';
+                else rankIcon = `<span class="text-gray-400 font-black text-lg w-6 text-center">${index + 1}</span>`;
+
+                const isCurrentUser = user.email === currentSessionEmail;
+                const bgClass = isCurrentUser ? 'bg-orange-50/50' : 'bg-white';
+                const nameClass = isCurrentUser ? 'text-orange-600' : 'text-navy';
+
+                listContainer.innerHTML += `
+                    <li class="flex items-center justify-between p-4 ${bgClass} hover:bg-gray-50 transition-colors">
+                        <div class="flex items-center gap-5">
+                            <div class="w-8 flex justify-center shrink-0">${rankIcon}</div>
+                            <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm text-white shadow-sm shrink-0" style="background-color: #1a365d;">
+                                ${user.name.charAt(0).toUpperCase()}
+                            </div>
+                            <div class="font-bold ${nameClass} truncate max-w-[150px] md:max-w-xs">
+                                ${user.name} ${isCurrentUser ? '<span class="text-[10px] bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full ml-1 uppercase">Bạn</span>' : ''}
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 shrink-0">
+                            <i class="fa-solid fa-fire-flame-curved text-orange-500"></i>
+                            <span class="font-black text-gray-800 text-lg w-6 text-right">${user.streak}</span>
+                            <span class="text-xs text-gray-500 font-medium">ngày</span>
+                        </div>
+                    </li>
+                `;
+            });
         }
 
         // --- CÀI ĐẶT & TÀI LIỆU ---
@@ -1399,6 +1136,52 @@
             document.getElementById('toast-message').innerText = msg;
             toast.classList.remove('translate-y-20', 'opacity-0');
             setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 3000);
+        }
+
+        // --- LOGIC CHUỖI HỌC TẬP ---
+        function checkAndUpdateStreakOnLogin() {
+            if (!currentUser) return;
+            
+            if (typeof currentUser.streak === 'undefined') currentUser.streak = 0;
+            if (typeof currentUser.lastExamDate === 'undefined') currentUser.lastExamDate = null;
+
+            const today = new Date();
+            today.setHours(0, 0, 0, 0); 
+
+            if (currentUser.lastExamDate) {
+                const lastDate = new Date(currentUser.lastExamDate);
+                lastDate.setHours(0, 0, 0, 0);
+                
+                const diffTime = Math.abs(today - lastDate);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                if (diffDays > 1) {
+                    currentUser.streak = 0;
+                }
+            }
+
+            let users = JSON.parse(localStorage.getItem('yaecute_users'));
+            users[currentSessionEmail] = currentUser;
+            localStorage.setItem('yaecute_users', JSON.stringify(users));
+
+            renderStreakUI();
+        }
+
+        function renderStreakUI() {
+            const streakCountEl = document.getElementById('streak-days-count');
+            const streakIcon = document.getElementById('streak-icon');
+            
+            if(streakCountEl && currentUser) {
+                streakCountEl.innerText = currentUser.streak || 0;
+                
+                if (currentUser.streak > 0) {
+                    streakIcon.classList.remove('text-gray-400');
+                    streakIcon.classList.add('text-orange-500', 'animate-pulse'); 
+                } else {
+                    streakIcon.classList.remove('text-orange-500', 'animate-pulse');
+                    streakIcon.classList.add('text-gray-400');
+                }
+            }
         }
 
         // --- PHÒNG THI SOLO ---
@@ -1494,9 +1277,7 @@
             });
 
             if (window.MathJax) {
-                MathJax.typesetPromise([container]).then(() => {
-                    console.log('MathJax rendering complete');
-                }).catch((err) => console.log(err.message));
+                MathJax.typesetPromise([container]).catch((err) => console.log(err.message));
             }
         }
 
@@ -1664,6 +1445,16 @@
                 const result = calculateScore();
                 const accuracy = result.total > 0 ? ((result.correct / result.total) * 100).toFixed(1) : 0;
 
+                // --- TĂNG CHUỖI HỌC TẬP ---
+                const todayStr = new Date().toISOString().split('T')[0]; 
+                if (currentUser.lastExamDate !== todayStr) {
+                    currentUser.streak = (currentUser.streak || 0) + 1;
+                    currentUser.lastExamDate = todayStr;
+                    showToast(`🔥 Tuyệt vời! Bạn đã đạt chuỗi ${currentUser.streak} ngày!`);
+                    renderStreakUI(); 
+                    renderStreakLeaderboard();
+                }
+
                 // --- LƯU LỊCH SỬ LÀM BÀI ---
                 if (!currentUser.examHistory) {
                     currentUser.examHistory = []; 
@@ -1712,7 +1503,7 @@
             switchView('exam-list');
         }
 
-        // --- HỆ THỐNG XEM LẠI ĐÁP ÁN (REVIEW) ---
+        // --- HỆ THỐNG XEM LẠI ĐÁP ÁN ---
         function checkQuestionCorrectness(q) {
             if (!userAnswers[q.id]) return false;
             if (q.type === 'multiple_choice' || q.type === 'fill_blank') {
@@ -1918,6 +1709,99 @@
             
             html += '</div>';
             container.innerHTML = html;
+        }
+
+        // --- LOGIC TRỢ LÝ GEMINI ---
+        function toggleGeminiChat() {
+            const panel = document.getElementById('gemini-chat-panel');
+            panel.classList.toggle('active');
+            if (panel.classList.contains('active')) {
+                document.getElementById('gemini-input').focus();
+            }
+        }
+
+        async function sendGeminiMessage(event) {
+            event.preventDefault();
+            const inputField = document.getElementById('gemini-input');
+            const messageText = inputField.value.trim();
+            if (!messageText) return;
+
+            const messagesContainer = document.getElementById('gemini-messages');
+
+            // 1. In tin nhắn của người dùng
+            messagesContainer.innerHTML += `
+                <div class="flex gap-3 flex-row-reverse">
+                    <div class="bg-blue-500 text-white p-3 rounded-2xl rounded-tr-none shadow-sm text-sm max-w-[85%]">
+                        ${messageText}
+                    </div>
+                </div>
+            `;
+            inputField.value = '';
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            // 2. Hiệu ứng đang gõ
+            const typingId = 'typing-' + Date.now();
+            messagesContainer.innerHTML += `
+                <div id="${typingId}" class="flex gap-3">
+                    <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center shrink-0">
+                        <i class="fa-solid fa-robot"></i>
+                    </div>
+                    <div class="bg-white p-3 rounded-2xl rounded-tl-none shadow-sm border border-gray-100 text-gray-500 text-sm flex items-center gap-1">
+                        <i class="fa-solid fa-circle text-[6px] animate-bounce"></i>
+                        <i class="fa-solid fa-circle text-[6px] animate-bounce" style="animation-delay: 0.1s"></i>
+                        <i class="fa-solid fa-circle text-[6px] animate-bounce" style="animation-delay: 0.2s"></i>
+                    </div>
+                </div>
+            `;
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            try {
+                // !!! NHỚ DÁN LẠI API KEY CỦA BẠN VÀO ĐÂY !!!
+                const API_KEY = "DAN_API_KEY_CUA_BAN_VAO_DAY"; 
+                
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent?key=${API_KEY}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: "Bạn là một gia sư AI thân thiện, hỗ trợ học sinh ôn thi THPT Quốc gia môn Toán, Lý, Hóa, Sinh. Hãy trả lời ngắn gọn, súc tích, dễ hiểu và format nội dung rõ ràng bằng markdown. Câu hỏi của học sinh: " + messageText }] }]
+                    })
+                });
+
+                const data = await response.json();
+                document.getElementById(typingId).remove();
+                
+                let botReply = "";
+
+                if (!response.ok) {
+                    botReply = `Lỗi từ Google: <b>${data.error.message}</b><br><br>👉 Bạn hãy kiểm tra lại API KEY nhé!`;
+                } else if (data.candidates && data.candidates[0].content.parts[0].text) {
+                    botReply = data.candidates[0].content.parts[0].text;
+                    botReply = botReply
+                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                        .replace(/\n/g, '<br>');
+                }
+
+                messagesContainer.innerHTML += `
+                    <div class="flex gap-3">
+                        <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center shrink-0">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        </div>
+                        <div class="bg-white p-3 rounded-2xl rounded-tl-none shadow-sm border border-gray-100 text-gray-700 text-sm max-w-[85%] leading-relaxed overflow-x-auto">
+                            ${botReply}
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                document.getElementById(typingId).remove();
+                messagesContainer.innerHTML += `
+                    <div class="flex gap-3">
+                        <div class="w-8 h-8 rounded-full bg-red-100 text-red-600 flex items-center justify-center shrink-0"><i class="fa-solid fa-wifi"></i></div>
+                        <div class="bg-red-50 text-red-700 p-3 rounded-2xl rounded-tl-none shadow-sm border border-red-100 text-sm">Lỗi mất mạng. Vui lòng kiểm tra lại kết nối Internet!</div>
+                    </div>
+                `;
+            }
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
     </script>
 </body>
